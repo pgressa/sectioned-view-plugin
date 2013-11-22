@@ -54,50 +54,48 @@ public abstract class SectionedViewSection implements ExtensionPoint, Describabl
         determineCss();
         initJobFilters();
     }
-
     /**
      * List of job names. This is what gets serialized.
      */
-    /*package*/ final SortedSet<String> jobNames = new TreeSet<String>(CaseInsensitiveComparator.INSTANCE);
-    /*package*/ DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>> jobFilters;
-
+    /*
+     * package
+     */ final SortedSet<String> jobNames = new TreeSet<String>(CaseInsensitiveComparator.INSTANCE);
+    /*
+     * package
+     */ 
+     DescribableList<ViewJobFilter, Descriptor<ViewJobFilter>> jobFilters;
     private String name;
-
-	/**
-	 * Include regex string.
-	 */
-	String includeRegex;
-
-	/**
-	 * Compiled include pattern from the includeRegex string.
-	 */
-	transient Pattern includePattern;
-
-	private Width width;
-
-	private Positioning alignment;
-
-	transient String css;
+    /**
+     * Include regex string.
+     */
+    String includeRegex;
+    /**
+     * Compiled include pattern from the includeRegex string.
+     */
+    transient Pattern includePattern;
+    private Width width;
+    private Positioning alignment;
+    transient String css;
 
     /**
      * Returns all the registered {@link SectionedViewSection} descriptors.
      */
     public static DescriptorExtensionList<SectionedViewSection, SectionedViewSectionDescriptor> all() {
-    	return Hudson.getInstance().<SectionedViewSection, SectionedViewSectionDescriptor>getDescriptorList(SectionedViewSection.class);
+        return Hudson.getInstance().<SectionedViewSection, SectionedViewSectionDescriptor>getDescriptorList(SectionedViewSection.class);
     }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public String getIncludeRegex() {
-		return includeRegex;
-	}
-    
+    public String getIncludeRegex() {
+        return includeRegex;
+    }
+
     public Iterable<ViewJobFilter> getJobFilters() {
         return jobFilters;
     }
@@ -106,7 +104,7 @@ public abstract class SectionedViewSection implements ExtensionPoint, Describabl
         return !ViewJobFilter.all().isEmpty();
     }
 
-	public Width getWidth() {
+    public Width getWidth() {
         return width;
     }
 
@@ -123,25 +121,28 @@ public abstract class SectionedViewSection implements ExtensionPoint, Describabl
     }
 
     public boolean contains(TopLevelItem item) {
-		return jobNames.contains(item.getName());
-	}
+        return jobNames.contains(item.getName());
+    }
 
-	protected Object readResolve() {
-		if (includeRegex != null)
-			includePattern = Pattern.compile(includeRegex);
-		if (width == null)
-		    width = Width.FULL;
-		if (alignment == null)
-		    alignment = Positioning.CENTER;
-		determineCss();
+    protected Object readResolve() {
+        if (includeRegex != null) {
+            includePattern = Pattern.compile(includeRegex);
+        }
+        if (width == null) {
+            width = Width.FULL;
+        }
+        if (alignment == null) {
+            alignment = Positioning.CENTER;
+        }
+        determineCss();
         initJobFilters();
-		return this;
-	}
+        return this;
+    }
 
-	private void determineCss() {
-	    final StringBuffer css = new StringBuffer();
-	    css.append(width.getCss());
-	    css.append(alignment.getCss());
+    private void determineCss() {
+        final StringBuffer css = new StringBuffer();
+        css.append(width.getCss());
+        css.append(alignment.getCss());
         if (width == Width.FULL || alignment == Positioning.CENTER) {
             css.append("clear: both; ");
         } else if (alignment == Positioning.LEFT) {
@@ -167,19 +168,20 @@ public abstract class SectionedViewSection implements ExtensionPoint, Describabl
         List<TopLevelItem> items = new ArrayList<TopLevelItem>(names.size());
         for (String n : names) {
             TopLevelItem item = itemGroup.getItem(n);
-            if(item!=null)
+            if (item != null) {
                 items.add(item);
+            }
         }
 
         // check the filters
         Iterable<ViewJobFilter> jobFilters = getJobFilters();
         List<TopLevelItem> allItems = new ArrayList<TopLevelItem>(itemGroup.getItems());
-        for (ViewJobFilter jobFilter: jobFilters) {
+        for (ViewJobFilter jobFilter : jobFilters) {
             items = jobFilter.filter(items, allItems, null);
         }
         return items;
-	}
-    
+    }
+
     protected void initJobFilters() {
         if (jobFilters != null) {
             return;
@@ -189,7 +191,7 @@ public abstract class SectionedViewSection implements ExtensionPoint, Describabl
     }
 
     public SectionedViewSectionDescriptor getDescriptor() {
-        return (SectionedViewSectionDescriptor)Hudson.getInstance().getDescriptor(getClass());
+        return (SectionedViewSectionDescriptor) Hudson.getInstance().getDescriptor(getClass());
     }
 
     public String getCss() {
@@ -200,12 +202,11 @@ public abstract class SectionedViewSection implements ExtensionPoint, Describabl
      * Constants that control how a Section is positioned.
      */
     public enum Positioning {
+
         CENTER("Center", "margin-left: auto; margin-right: auto; "),
         LEFT("Left", "float: left; "),
         RIGHT("Right", "float: right; ");
-
         private final String description;
-
         private final String css;
 
         public String getDescription() {
@@ -234,15 +235,13 @@ public abstract class SectionedViewSection implements ExtensionPoint, Describabl
      * Constants that control how a Section is floated.
      */
     public enum Width {
+
         FULL("Full", 100, "width: 100%; "),
         HALF("1/2", 50, "width: 50%; "),
         THIRD("1/3", 33, "width: 33%; "),
         TWO_THIRDS("2/3", 66, "width: 66%; ");
-
         private final String description;
-
         private final String css;
-
         private final int percent;
 
         public String getDescription() {

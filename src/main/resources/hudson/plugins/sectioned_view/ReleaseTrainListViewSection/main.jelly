@@ -1,0 +1,130 @@
+<!--
+The MIT License
+
+Copyright (c) 2009-2011, Timothy Bingaman
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+    <link type="text/css" rel="stylesheet" href="${resURL}/plugin/sectioned-view/rt-section.css" />
+    
+    <j:if test="${section.name.length() > 0}">
+        <h2>${section.name}</h2>
+    </j:if>
+    <j:if test="${empty(section.getItems(it.ownerItemGroup))}">
+        <p>No jobs in this section.</p>
+    </j:if>
+
+<!-- <j:set var="columnExtensions" value="${section.columns}"/> -->
+
+    <div style="clear:both">
+        <div style="float:left; width:15%">
+            <table class="pane bigtable" style="margin-top:0px">
+                <thead style="border-top: 0px;">
+                    <th>AD Status</th>                  
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="td-ad-score">
+                            <span>83%</span>
+                        </td>
+                        <tr>
+                            <td>                                
+                                <div>
+                                    <b>Age: </b>
+                                    <span>24h</span>
+                                </div>
+                                <div>                                
+                                    <b>Labels: </b>  
+                                    <span>rc98.2</span>
+                                </div>                                
+                                <div>
+                                    <b>Notes: </b> 
+                                    <span>New features?</span>
+                                </div>
+                            </td>                        
+                        </tr>
+                        <tr>
+                            <td>
+                                <div>
+                                    Other RT info ?? Jira Issues?
+                                </div>
+                            </td>
+                        </tr>
+                    </tr>                    
+                </tbody>
+            </table>
+        </div>
+        
+
+        <table id="projectstatus" class="pane bigtable" style="width:85%">
+            <thead style="border-top: 0px;">
+           
+                <th tooltip="${%Status of the last build}">
+                    <j:out value="${h.nbspIndent(iconSize)}"/>S
+                </th>
+                <th initialSortDir="down">Name</th>
+                <th>Test Results</th>
+                <th>Console</th>
+                <th>Duration</th>
+                <th>        
+                    <st:nbsp/>
+                </th>
+    
+            </thead>
+            <tbody>       
+            
+                <j:forEach var="job" items="${section.getItems(it.ownerItemGroup)}" varStatus="status">
+                    <j:set var="rtBuild" value="${section.getLastStableBuildFor(job)}"/>                                
+                    <tr id="job_${job.name}" class="${job.disabled?'disabledJob':null}" >
+                                                       
+                        <!--  Colored Status  -->                                
+                        <t:ballColorTd it="${rtBuild.iconColor}" style="${indenter.getRelativeShift(job)}"/>
+                
+                        <!-- Job Name -->
+                        <td style="${indenter.getCss(job)}">
+                            <a href="${jobBaseUrl}${job.shortUrl}" class='model-link'> ${useFullName ? job.fullDisplayName : job.displayName}</a>
+                        </td>
+                
+                        <!-- How many of them passed - meta information from RT ? -->
+                        <td>
+                            <span style="color:red">89</span>/
+                            <span>1600</span> 
+                        </td>
+                        
+                        <!-- Console columns - link to the build console output -->
+                        <td>
+                            <a href="${jobBaseUrl}${rtBuild.url}console">
+                                <img src="${imagesURL}/${subIconSize}/terminal.gif" title="${%Console output}"
+                                 alt="${%Console output}" border="0" />
+                            </a>
+                        </td>                       
+                        <td>                    
+                            ${rtBuild.durationString}                                        
+                        </td>
+                        <td>
+                            <st:nbsp/>
+                        </td>
+                    </tr>
+            
+                </j:forEach>
+            </tbody>
+        </table>
+    </div>
+</j:jelly>
